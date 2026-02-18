@@ -1,63 +1,56 @@
-# TIC TAC TOE - CONSOLE VERSION
+# GUI Tic-Tac-Toe Game using Tkinter
 
-board = [" " for _ in range(9)]
-current_player = "X"
+import tkinter as tk
+from tkinter import messagebox
+
+class TicTacToe:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Tic-Tac-Toe")
+
+        self.current_player = "X"
+        self.buttons = []
+
+        for i in range(9):
+            button = tk.Button(root, text=" ", font=("Arial", 24), width=5, height=2,
+                               command=lambda i=i: self.button_click(i))
+            button.grid(row=i//3, column=i%3)
+            self.buttons.append(button)
+
+    def button_click(self, index):
+        if self.buttons[index]["text"] == " ":
+            self.buttons[index]["text"] = self.current_player
+
+            if self.check_winner():
+                messagebox.showinfo("Game Over", f"Player {self.current_player} wins!")
+                self.reset_game()
+            elif all(button["text"] != " " for button in self.buttons):
+                messagebox.showinfo("Game Over", "It's a draw!")
+                self.reset_game()
+            else:
+                self.current_player = "O" if self.current_player == "X" else "X"
+
+    def check_winner(self):
+        win_positions = [
+            [0,1,2], [3,4,5], [6,7,8],
+            [0,3,6], [1,4,7], [2,5,8],
+            [0,4,8], [2,4,6]
+        ]
+        for pos in win_positions:
+            if (self.buttons[pos[0]]["text"] ==
+                self.buttons[pos[1]]["text"] ==
+                self.buttons[pos[2]]["text"] != " "):
+                return True
+        return False
+
+    def reset_game(self):
+        for button in self.buttons:
+            button["text"] = " "
+        self.current_player = "X"
 
 
-def show_board():
-    print()
-    print(board[0] + " | " + board[1] + " | " + board[2])
-    print("--+---+--")
-    print(board[3] + " | " + board[4] + " | " + board[5])
-    print("--+---+--")
-    print(board[6] + " | " + board[7] + " | " + board[8])
-    print()
+if __name__ == "__main__":
+    root = tk.Tk()
+    game = TicTacToe(root)
+    root.mainloop()
 
-
-def check_winner():
-    win_combinations = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
-    ]
-
-    for combo in win_combinations:
-        if board[combo[0]] == board[combo[1]] == board[combo[2]] != " ":
-            return True
-    return False
-
-
-def is_draw():
-    return " " not in board
-
-
-while True:
-    show_board()
-
-    try:
-        move = int(input(f"Player {current_player}, choose position (1-9): ")) - 1
-    except:
-        print("Invalid input!")
-        continue
-
-    if move < 0 or move > 8:
-        print("Choose from 1 to 9 only.")
-        continue
-
-    if board[move] != " ":
-        print("Position already taken.")
-        continue
-
-    board[move] = current_player
-
-    if check_winner():
-        show_board()
-        print(f"Player {current_player} wins!")
-        break
-
-    if is_draw():
-        show_board()
-        print("It's a draw!")
-        break
-
-    current_player = "O" if current_player == "X" else "X"
