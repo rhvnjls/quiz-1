@@ -1,63 +1,60 @@
-# TIC TAC TOE - CONSOLE VERSION
+# Console-Based Tic-Tac-Toe Game
 
-board = [" " for _ in range(9)]
-current_player = "X"
-
-
-def show_board():
-    print()
+def print_board(board):
+    print("\n")
     print(board[0] + " | " + board[1] + " | " + board[2])
     print("--+---+--")
     print(board[3] + " | " + board[4] + " | " + board[5])
     print("--+---+--")
     print(board[6] + " | " + board[7] + " | " + board[8])
-    print()
+    print("\n")
 
 
-def check_winner():
-    win_combinations = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
+def check_winner(board, player):
+    win_positions = [
+        [0,1,2], [3,4,5], [6,7,8],  # rows
+        [0,3,6], [1,4,7], [2,5,8],  # columns
+        [0,4,8], [2,4,6]            # diagonals
     ]
-
-    for combo in win_combinations:
-        if board[combo[0]] == board[combo[1]] == board[combo[2]] != " ":
+    for pos in win_positions:
+        if board[pos[0]] == board[pos[1]] == board[pos[2]] == player:
             return True
     return False
 
 
-def is_draw():
-    return " " not in board
+def tic_tac_toe():
+    board = [" " for _ in range(9)]
+    current_player = "X"
+    moves = 0
+
+    while True:
+        print_board(board)
+        try:
+            choice = int(input(f"Player {current_player}, choose position (1-9): ")) - 1
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 9.")
+            continue
+
+        if choice < 0 or choice > 8 or board[choice] != " ":
+            print("Invalid move. Try again.")
+            continue
+
+        board[choice] = current_player
+        moves += 1
+
+        if check_winner(board, current_player):
+            print_board(board)
+            print(f"🎉 Player {current_player} wins!")
+            break
+
+        if moves == 9:
+            print_board(board)
+            print("It's a draw!")
+            break
+
+        current_player = "O" if current_player == "X" else "X"
 
 
-while True:
-    show_board()
+if __name__ == "__main__":
+    tic_tac_toe()
 
-    try:
-        move = int(input(f"Player {current_player}, choose position (1-9): ")) - 1
-    except:
-        print("Invalid input!")
-        continue
-
-    if move < 0 or move > 8:
-        print("Choose from 1 to 9 only.")
-        continue
-
-    if board[move] != " ":
-        print("Position already taken.")
-        continue
-
-    board[move] = current_player
-
-    if check_winner():
-        show_board()
-        print(f"Player {current_player} wins!")
-        break
-
-    if is_draw():
-        show_board()
-        print("It's a draw!")
-        break
-
-    current_player = "O" if current_player == "X" else "X"
